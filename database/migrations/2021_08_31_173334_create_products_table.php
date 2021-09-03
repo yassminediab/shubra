@@ -17,6 +17,9 @@ class CreateProductsTable extends Migration
             $table->id();
             $table->string('name');
             $table->text('description');
+            $table->string('meta_title');
+            $table->text('meta_description');
+            $table->text('meta_keyword');
             $table->string('image');
             $table->boolean('availability');
             $table->string('price_per_piece')->default(0);
