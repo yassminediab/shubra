@@ -17,12 +17,12 @@ class CreateCategoriesTable extends Migration
             $table->id();
             $table->string('name');
             $table->text('description')->nullable();
-            $table->string('image');
-            $table->string('meta_title');
-            $table->text('meta_description');
-            $table->text('meta_keyword');
-            $table->boolean('status');
-            $table->foreignId('parent')->nullable()->references('id')->on('categories')->onDelete('cascade');
+            $table->string('image')->nullable();
+            $table->string('meta_title')->nullable();
+            $table->text('meta_description')->nullable();
+            $table->text('meta_keyword')->nullable();
+            $table->boolean('status')->nullable();
+            $table->bigInteger('parent')->nullable();
             $table->timestamps();
         });
     }

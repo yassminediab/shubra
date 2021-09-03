@@ -9,4 +9,5 @@ class Category extends Model
 {
     use Translatable;
     protected $translatable = ['name', 'description', 'meta_description', 'meta_title', 'meta_keyword'];
+    protected $fillable = ['id','name','description', 'meta_description', 'meta_title', 'meta_keyword','status','parent','image'];
 }
