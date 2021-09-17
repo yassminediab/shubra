@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class MigrateOldBrands extends Migration
+class AddColumnOfferInProductsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,7 +13,10 @@ class MigrateOldBrands extends Migration
      */
     public function up()
     {
-
+        Schema::table('products', function (Blueprint $table) {
+            $table->string('mostly_view')->nullable();
+            $table->date('mostly_view_end_date')->nullable();
+        });
     }
 
     /**
@@ -23,6 +26,8 @@ class MigrateOldBrands extends Migration
      */
     public function down()
     {
-        //
+        Schema::table('products', function (Blueprint $table) {
+            //
+        });
     }
 }

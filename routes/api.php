@@ -17,3 +17,9 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
+Route::get('categories/{id?}', 'API\CategoryController@index')->middleware('localization');
+Route::get('homepage', 'API\HomePageController@index')->middleware('localization');
+Route::get('offers', 'API\OfferController@index')->middleware('localization');
+Route::get('offers/{id}', 'API\OfferController@show')->middleware('localization');
+
+

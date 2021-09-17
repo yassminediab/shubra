@@ -38,7 +38,6 @@ class MigrateOldCategories extends Migration
             $new_category->meta_keyword = $category_ar->meta_keyword;
             $new_category->save();
         }
-        die;
     }
 
     /**

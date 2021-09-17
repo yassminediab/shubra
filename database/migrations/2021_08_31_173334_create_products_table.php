@@ -20,15 +20,14 @@ class CreateProductsTable extends Migration
             $table->string('sku');
             $table->integer('quantity');
             $table->text('description');
-            $table->string('meta_title');
-            $table->text('meta_description');
-            $table->text('meta_keyword');
-            $table->string('image');
-            $table->date('date_available');
-            $table->string('price_per_piece')->default(0);
-            $table->integer('price_per_kilo')->default(0);
-            $table->foreignId('brand_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('category_id')->constrained()->cascadeOnDelete();
+            $table->string('meta_title')->nullable();
+            $table->text('meta_description')->nullable();
+            $table->text('meta_keyword')->nullable();
+            $table->string('image')->nullable();
+            $table->string('tag')->nullable();
+            $table->string('date_available')->nullable();
+            $table->string('price')->default(0);
+            $table->integer('status')->default(0);
             $table->timestamps();
         });
     }

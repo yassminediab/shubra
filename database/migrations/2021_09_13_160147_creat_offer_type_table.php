@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class MigrateOldBrands extends Migration
+class CreatOfferTypeTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,7 +13,11 @@ class MigrateOldBrands extends Migration
      */
     public function up()
     {
-
+        Schema::create('offer_type', function (Blueprint $table) {
+            $table->id();
+            $table->string('type');
+            $table->timestamps();
+        });
     }
 
     /**
@@ -23,6 +27,6 @@ class MigrateOldBrands extends Migration
      */
     public function down()
     {
-        //
+        Schema::dropIfExists('offer_type');
     }
 }

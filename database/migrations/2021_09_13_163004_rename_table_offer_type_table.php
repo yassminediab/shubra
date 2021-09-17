@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class MigrateOldBrands extends Migration
+class RenameTableOfferTypeTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,7 +13,9 @@ class MigrateOldBrands extends Migration
      */
     public function up()
     {
-
+        Schema::table('offer_type', function (Blueprint $table) {
+            Schema::rename('offer_type', 'offer_types');
+        });
     }
 
     /**
@@ -23,6 +25,8 @@ class MigrateOldBrands extends Migration
      */
     public function down()
     {
-        //
+        Schema::table('offer_type', function (Blueprint $table) {
+            //
+        });
     }
 }
