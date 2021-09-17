@@ -22,4 +22,8 @@ Route::get('homepage', 'API\HomePageController@index')->middleware('localization
 Route::get('offers', 'API\OfferController@index')->middleware('localization');
 Route::get('offers/{id}', 'API\OfferController@show')->middleware('localization');
 
+Route::post('login', 'API\AuthController@login');
+Route::post('register', 'API\AuthController@register');
+
+
 

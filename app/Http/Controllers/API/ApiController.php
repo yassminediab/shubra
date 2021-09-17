@@ -49,18 +49,18 @@ class ApiController extends Controller
      * @param string $msg
      * @return \Illuminate\Http\JsonResponse
      */
-    public function respondNotAcceptable($msg = 'Not Acceptable')
+    public function respondNotAcceptable($msg = 'Not Acceptable', $errors = [])
     {
-        return $this->setStatusCode(406)->respondWithError($msg);
+        return $this->setStatusCode(406)->respondWithError($msg, $errors);
     }
 
     /**
      * @param $msg
      * @return \Illuminate\Http\JsonResponse
      */
-    public function respondWithError($msg)
+    public function respondWithError($msg, $errors = [])
     {
-        return $this->respond(["success" => false, "msg" => $msg]);
+        return $this->respond(["success" => false, "msg" => $msg, "errors" => $errors]);
     }
 
 
@@ -110,8 +110,8 @@ class ApiController extends Controller
      * @param string $msg
      * @return \Illuminate\Http\JsonResponse
      */
-    public function respondBadRequest($msg = 'Not Acceptable')
+    public function respondBadRequest($msg = 'Not Acceptable', $errors = [])
     {
-        return $this->setStatusCode(400)->respondWithError($msg);
+        return $this->setStatusCode(400)->respondWithError($msg,$errors);
     }
 }
