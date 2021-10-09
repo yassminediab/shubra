@@ -14,7 +14,17 @@ class Product extends Model
 
     public function offers()
     {
-        return $this->belongsToMany(Offer::class, 'product_offer');
+        return $this->belongsToMany(Offer::class, 'product_offers')->withPivot('discount');
+    }
+
+    public function categories()
+    {
+        return $this->belongsToMany(Category::class, 'product_categories');
+    }
+
+    public function reviews()
+    {
+        return $this->hasMany(ProductReview::class);
     }
 
     public function scopeHasOffer($query)

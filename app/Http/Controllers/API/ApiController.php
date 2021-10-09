@@ -2,6 +2,8 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Response;
 
 class ApiController extends Controller
@@ -33,7 +35,7 @@ class ApiController extends Controller
      */
     public function respondNotFound($msg = 'Not Found')
     {
-        return $this->setStatusCode(404)->respondWithError($msg);
+        return $this->setStatusCode(404)->respondWithError($msg,[],404);
     }
 
     /**
@@ -42,7 +44,7 @@ class ApiController extends Controller
      */
     public function respondNotAuthenticated($msg = 'Not Authenticated')
     {
-        return $this->setStatusCode(401)->respondWithError($msg);
+        return $this->setStatusCode(401)->respondWithError($msg,[],401);
     }
 
     /**
@@ -51,16 +53,16 @@ class ApiController extends Controller
      */
     public function respondNotAcceptable($msg = 'Not Acceptable', $errors = [])
     {
-        return $this->setStatusCode(406)->respondWithError($msg, $errors);
+        return $this->setStatusCode(406)->respondWithError($msg, $errors, 406);
     }
 
     /**
      * @param $msg
      * @return \Illuminate\Http\JsonResponse
      */
-    public function respondWithError($msg, $errors = [])
+    public function respondWithError($msg, $errors = [],$code = 400)
     {
-        return $this->respond(["success" => false, "msg" => $msg, "errors" => $errors]);
+        return $this->respond(["status" => false, "message" => $msg, "error" => $errors, 'data' => [],"code" => $code]);
     }
 
 
@@ -90,10 +92,21 @@ class ApiController extends Controller
      * @param array $data
      * @return \Illuminate\Http\JsonResponse
      */
-    public function respondSuccess($msg = '', $data = [])
+    public function respondSuccess($msg = '', $data = [],$code = 200)
     {
-        return $this->respond(["success" => true, "data" => $data, 'msg' => $msg]);
+        return $this->respond(["status" => true, "data" => $data, 'message' => $msg, 'error' => [], "code" => $code]);
     }
+
+
+    public function respondPaginated($message , $data, LengthAwarePaginator $collection)
+    {
+        $data['nextPageUrl'] = $collection->nextPageUrl();
+        $data['currentPage'] = $collection->currentPage();
+        $data['total'] = $collection->total();
+        $data['hasMorePages'] = $collection->hasMorePages();
+        return $this->respondSuccess($message, $data);
+    }
+
     /**
      * abstract respond method
      * @param $data
@@ -107,11 +120,11 @@ class ApiController extends Controller
 
     /**
      * simple 400 Bad request response
-     * @param string $msg
+     * @param string $message
      * @return \Illuminate\Http\JsonResponse
      */
-    public function respondBadRequest($msg = 'Not Acceptable', $errors = [])
+    public function respondBadRequest($message = 'Not Acceptable', $errors = [])
     {
-        return $this->setStatusCode(400)->respondWithError($msg,$errors);
+        return $this->setStatusCode(400)->respondWithError($message,$errors);
     }
 }

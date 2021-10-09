@@ -7,7 +7,7 @@ use Saad\Fractal\Transformers\TransformerAbstract;
 
 class ProductTransformer extends TransformerAbstract
 {
-    protected $defaultIncludes = ['id','name', 'description', 'image','price', 'offer'];
+    protected $defaultIncludes = ['id','name', 'description', 'image','price', 'offer','rate','size_per_unit','unit_of_measure'];
 
     public function includeId(Product $product)
     {
@@ -36,6 +36,26 @@ class ProductTransformer extends TransformerAbstract
 
     public function includeOffer(Product $product)
     {
-        return $this->primitive($product->pivot->offer);
+        if($product->pivot) {
+            $offer = $product->pivot->discount;
+        } elseif ($product->offers->count() > 0)  {
+            $offer = $product->offers[0]->pivot->discount;
+        }
+        return $this->primitive($offer ?? 0);
+    }
+
+    public function includeRate(Product $product)
+    {
+        return $this->primitive($product->rate);
+    }
+
+    public function includeUnitOfMeasure(Product $product)
+    {
+        return $this->primitive($product->unit_of_measure);
+    }
+
+    public function includeSizePerUnit(Product $product)
+    {
+        return $this->primitive($product->size_per_unit);
     }
 }

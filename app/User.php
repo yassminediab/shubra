@@ -18,7 +18,7 @@ class User extends \TCG\Voyager\Models\User implements JWTSubject
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password',
+        'name', 'email', 'password', 'phone' , 'is_active'
     ];
 
     /**
@@ -57,5 +57,10 @@ class User extends \TCG\Voyager\Models\User implements JWTSubject
     public function getJWTCustomClaims()
     {
         return [];
+    }
+
+    public function products()
+    {
+        return $this->belongsToMany(Product::class, 'wishlists');
     }
 }

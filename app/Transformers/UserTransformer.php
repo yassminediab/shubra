@@ -12,6 +12,7 @@ namespace App\Transformers;
 
 
 use App\Entities\UserEntity;
+use App\User;
 use League\Fractal\TransformerAbstract;
 
 class UserTransformer extends TransformerAbstract
@@ -20,13 +21,13 @@ class UserTransformer extends TransformerAbstract
      * Default Includes
      * @var array
      */
-    protected $defaultIncludes = ['id', 'email', 'status', 'currency', 'amount', 'created_at'];
+    protected $defaultIncludes = ['id', 'name' , 'image', 'email', 'phone'];
 
     /**
      * @param UserEntity $user
      * @return array
      */
-    public function transform(UserEntity $user)
+    public function transform(User $user)
     {
         return [
 
@@ -37,54 +38,33 @@ class UserTransformer extends TransformerAbstract
      * @param UserEntity $user
      * @return \League\Fractal\Resource\Primitive
      */
-    public function includeId(UserEntity $user)
+    public function includeId(User $user)
     {
-        return $this->primitive($user->getIdentification());
+        return $this->primitive($user->id);
     }
 
     /**
      * @param UserEntity $user
      * @return \League\Fractal\Resource\Primitive
      */
-    public function includeEmail(UserEntity $user)
+    public function includeEmail(User $user)
     {
-        return $this->primitive($user->getEmail());
+        return $this->primitive($user->email);
     }
 
-    /**
-     * @param UserEntity $user
-     * @return \League\Fractal\Resource\Primitive
-     */
-    public function includeCurrency(UserEntity $user)
+    public function includePhone(User $user)
     {
-        return $this->primitive($user->getCurrency());
+        return $this->primitive($user->phone);
     }
 
-    /**
-     * @param UserEntity $user
-     * @return \League\Fractal\Resource\Primitive
-     */
-    public function includeStatus(UserEntity $user)
+    public function includeImage(User $user)
     {
-        return $this->primitive($user->getStatusCode());
+        return $this->primitive($user->image);
     }
 
-    /**
-     * @param UserEntity $user
-     * @return \League\Fractal\Resource\Primitive
-     */
-    public function includeCreatedAt(UserEntity $user)
+    public function includeName(User $user)
     {
-        return $this->primitive($user->getRegistrationDate());
-    }
-
-    /**
-     * @param UserEntity $user
-     * @return \League\Fractal\Resource\Primitive
-     */
-    public function includeAmount(UserEntity $user)
-    {
-        return $this->primitive($user->getAmount());
+        return $this->primitive($user->name);
     }
 
 }
