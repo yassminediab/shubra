@@ -62,6 +62,53 @@ class AddressController extends ApiController
         return $this->respondSuccess('',$transformedAddress);
     }
 
+    public function deleteAddress($id)
+    {
+        $address = Address::find($id);
+        if(!$address) {
+            return $this->respondNotFound('Address not found');
+        }
+        $address->delete();
+
+        return $this->respondSuccess('Address deleted successfully');
+    }
+
+    public function editAddress(Request $request,$id)
+    {
+        $address = Address::find($id);
+        if(!$address) {
+            return $this->respondNotFound('Address not found');
+        }
+
+        $validator = Validator::make($request->all(), [
+            'full_name' => 'required',
+            'address' => 'required',
+            'pincode' => 'required',
+            'landmark' => 'required',
+            'city_id' => 'required|exists:cities,id',
+            'state_id' => 'required|exists:states,id',
+            'address_type' => 'required',
+            'mobile' => 'required',
+            'lat' => 'required',
+            'lng' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->respondBadRequest("", ['errors' => $validator->errors()]);
+        }
+
+        $user = $request->user();
+
+        if($address->user_id != $user->id) {
+            return $this->respondNotAuthenticated();
+        }
+
+        $data = $request->all();
+        $address = Address::where('id',$id)->update($data);
+
+        return $this->respondSuccess('Address updated successfully',$address);
+    }
+
     public function listCities()
     {
         $cities = City::get();

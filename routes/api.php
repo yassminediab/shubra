@@ -29,6 +29,7 @@ Route::post('users/verify', 'API\AuthController@verifyUser');
 Route::post('products/{id}/reviews', 'API\ProductController@reviewProduct')->middleware('jwt.auth');
 Route::get('products/{id}/reviews', 'API\ProductController@getProductReviews');
 Route::get('products/{id}', 'API\ProductController@getProduct');
+Route::post('/products/{id}/wishlist', 'API\ProductController@wishlistProduct')->middleware('jwt.auth');
 
 Route::post('carts/{id?}', 'API\CartController@addToCart')->middleware('jwt.verify');
 Route::get('carts/{id}', 'API\CartController@getCart');
@@ -37,6 +38,8 @@ Route::delete('carts/{id}/products/{productId}', 'API\CartController@deleteCart'
 Route::post('addresses', 'API\AddressController@createAddress')->middleware('jwt.verify');
 Route::get('addresses', 'API\AddressController@getAddresses')->middleware('jwt.auth');
 Route::get('addresses/{id}', 'API\AddressController@getAddress')->middleware('jwt.verify');
+Route::delete('addresses/{id}', 'API\AddressController@deleteAddress')->middleware('jwt.auth');
+Route::put('addresses/{id}', 'API\AddressController@editAddress')->middleware('jwt.auth');
 Route::get('cities', 'API\AddressController@listCities')->middleware('jwt.verify');
 Route::get('states/{id}', 'API\AddressController@listStates')->middleware('jwt.verify');
 
@@ -46,7 +49,14 @@ Route::get('orders', 'API\OrderController@listOrders')->middleware('jwt.auth');
 Route::post('orders/{id}/feedback', 'API\OrderController@rateOrder')->middleware('jwt.verify');
 Route::post('orders/{id}/delivery-feedback', 'API\OrderController@rateDelivery')->middleware('jwt.verify');
 
-Route::get('coupons', 'API\OrderController@listOrders')->middleware('jwt.auth');
+Route::get('/wishlist', 'API\UserController@getWishlist')->middleware('jwt.auth');
+Route::put('/profile', 'API\UserController@editProfile')->middleware('jwt.auth');
+Route::put('/email', 'API\UserController@editEmail')->middleware('jwt.auth');
+Route::put('/phone', 'API\UserController@editPhone')->middleware('jwt.auth');
+Route::put('/password', 'API\UserController@editPassword')->middleware('jwt.auth');
+Route::post('/avatar', 'API\UserController@editAvatar')->middleware('jwt.auth');
+Route::get('/profile', 'API\UserController@getProfile')->middleware('jwt.auth');
+
 
 
 

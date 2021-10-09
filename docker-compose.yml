@@ -1,0 +1,62 @@
+version: '3.5'
+
+services:
+  shubra:
+    build:
+      context: '.'
+      args:
+        uid: ${UID}
+    container_name: shubra
+    environment:
+      - APACHE_RUN_USER=#${UID}
+      - APACHE_RUN_GROUP=#${UID}
+    volumes:
+      - type: bind
+        source: .
+        target: /var/www/html
+      - type: bind
+        source: ./storage/app/public/
+        target: /var/www/html/public/storage/
+      - type: bind
+        source: ./uploads.ini
+        target: /usr/local/etc/php/conf.d/uploads.ini
+    ports:
+      - 8000:80
+    networks:
+      backend:
+        aliases:
+          - shubra
+
+  shubra-mysql-db:
+    image: mysql:5.7
+    container_name: mysql-db
+    volumes:
+      - ./run/var:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=
+      - MYSQL_DATABASE=shubra
+      - MYSQL_USER=root
+      - MYSQL_PASSWORD=
+      - MYSQL_ALLOW_EMPTY_PASSWORD=yes
+    networks:
+      backend:
+        aliases:
+          - shubra-db
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    links:
+      - shubra-mysql-db
+    environment:
+      PMA_HOST: mysql-db
+      PMA_PORT: 3306
+    ports:
+      - '8080:80'
+    networks:
+      backend:
+        aliases:
+          - phpmyadmin
+
+networks:
+  backend:
+    name: shubra-network

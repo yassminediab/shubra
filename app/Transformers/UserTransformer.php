@@ -21,7 +21,7 @@ class UserTransformer extends TransformerAbstract
      * Default Includes
      * @var array
      */
-    protected $defaultIncludes = ['id', 'name' , 'image', 'email', 'phone'];
+    protected $defaultIncludes = ['id', 'name' , 'avatar', 'email', 'phone','last_name' , 'date_of_birth','title'];
 
     /**
      * @param UserEntity $user
@@ -57,14 +57,29 @@ class UserTransformer extends TransformerAbstract
         return $this->primitive($user->phone);
     }
 
-    public function includeImage(User $user)
+    public function includeAvatar(User $user)
     {
-        return $this->primitive($user->image);
+        return $this->primitive(asset('storage/'.$user->avatar));
     }
 
     public function includeName(User $user)
     {
         return $this->primitive($user->name);
+    }
+
+    public function includeLastName(User $user)
+    {
+        return $this->primitive($user->last_name);
+    }
+
+    public function includeDateOfBirth(User $user)
+    {
+        return $this->primitive($user->date_of_birth);
+    }
+
+    public function includeTitle(User $user)
+    {
+        return $this->primitive($user->title);
     }
 
 }

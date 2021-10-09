@@ -97,4 +97,13 @@ class ProductController extends ApiController
 
         return $this->respondSuccess('product returned successfully',['product' => $transformedProduct,'similar_products'=> $transformedSimilarProduct]);
     }
+
+    public function wishlistProduct($id, Request $request)
+    {
+        $user = $request->user();
+
+        $user->wishlist()->attach([$id]);
+
+        return $this->respondSuccess('Wishlist created successfully');
+    }
 }

@@ -2,12 +2,15 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Transformers\ProductReviewTransformer;
+use App\Transformers\UserTransformer;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 use App\User;
+use Saad\Fractal\Fractal;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
@@ -31,6 +34,8 @@ class AuthController extends ApiController
             if (!$user->is_active) {
                 return $this->respondNotAuthenticated('User not verified');
             }
+            $user = Fractal::create($user, new UserTransformer());
+
             return $this->respondAccepted("", ['token' => $token, 'user' => $user]);
         } catch (JWTException $e) {
             // something went wrong
@@ -61,6 +66,8 @@ class AuthController extends ApiController
 
         $user = User::create($data);
 
+        $user = Fractal::create($user, new UserTransformer());
+
         return $this->respondAccepted("User created successfully", ['user' => $user]);
     }
 
@@ -81,6 +88,7 @@ class AuthController extends ApiController
         }
 
         $user = User::where('phone' , $request->phone)->update(['is_active' => true]);
+        $user = Fractal::create($user, new UserTransformer());
 
         return $this->respondAccepted("User verified successfully", ['user' => $user]);
     }
