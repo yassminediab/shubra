@@ -42,6 +42,13 @@ class Order extends Model
         ],
     ];
 
+    const NEXT_STATUS = [
+        'confirmed' => 'preparing',
+        'preparing' => 'shipped',
+        'shipped' => 'delivered',
+        'delivered' => '',
+    ];
+
     const PAYMENT_STATUSES = [
         'cash_on_delivery' => [
             'en' => 'Cash on delivery',

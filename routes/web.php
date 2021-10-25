@@ -21,5 +21,7 @@ Route::get('/', function () {
 
 
 Route::group(['prefix' => 'admin'], function () {
+    Route::get('orders/status','Voyager\OrderController@changeStatus')->name('orders.status');
+
     Voyager::routes();
 });

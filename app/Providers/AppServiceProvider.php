@@ -11,6 +11,7 @@ use App\Observers\ProductObserver;
 use App\Offer;
 use App\Product;
 use Illuminate\Support\ServiceProvider;
+use TCG\Voyager\Facades\Voyager;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -35,5 +36,7 @@ class AppServiceProvider extends ServiceProvider
         Category::observe(CategoryObserver::class);
         Offer::observe(OfferObserver::class);
         Coupon::observe(CouponObserver::class);
+        Voyager::addAction(\App\Actions\OrderStatusAction::class);
+
     }
 }
