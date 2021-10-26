@@ -23,17 +23,17 @@ class product extends BaseDimmer
     public function run()
     {
         $count =  productModel::count();
-        $string = 'products';
+        $string = 'منتجات';
 
         return view('voyager::dimmer', array_merge($this->config, [
-            'icon'   => 'voyager-news',
+            'icon'   => 'voyager-bag',
             'title'  => "{$count} {$string}",
-            'text'   => __('dimmer.news_text', ['count' => $count, 'string' => Str::lower($string)]),
+            'text'   => __('dimmer.user_text', ['count' => $count, 'string' => Str::lower($string)]),
             'button' => [
-                'text' => 'products',
+                'text' => 'المنتجات',
                 'link' => route('voyager.products.index'),
             ],
-            'image' => asset('images/paige_spiranac_golf.jpg'),
+            'image' => voyager_asset('images/paige_spiranac_golf.jpg'),
         ]));
     }
 

@@ -27,9 +27,9 @@ services:
         aliases:
           - shubra
 
-  shubra-mysql-db:
+  shubra-mysql:
     image: mysql:5.7
-    container_name: mysql-db
+    container_name: mysql
     volumes:
       - ./run/var:/var/lib/mysql
     environment:
@@ -46,9 +46,9 @@ services:
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
     links:
-      - shubra-mysql-db
+      - shubra-mysql
     environment:
-      PMA_HOST: mysql-db
+      PMA_HOST: mysql
       PMA_PORT: 3306
     ports:
       - '8080:80'
