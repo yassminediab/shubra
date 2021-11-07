@@ -8,7 +8,7 @@ use Saad\Fractal\Transformers\TransformerAbstract;
 
 class AddressTransformer extends TransformerAbstract
 {
-    protected $defaultIncludes = ['id','full_name', 'address','landmark','address_type','city','pincode','state','mobile','lat','lng'];
+    protected $defaultIncludes = ['id','full_name', 'address','landmark','address_type','city','pincode','state','mobile','lat','lng','is_verified'];
 
     public function includeId(Address $address)
     {
@@ -63,6 +63,11 @@ class AddressTransformer extends TransformerAbstract
     public function includeLng(Address $address)
     {
         return $this->primitive($address->lng);
+    }
+
+    public function includeIsVerified(Address $address)
+    {
+        return $this->primitive($address->isVerified);
     }
 
 }

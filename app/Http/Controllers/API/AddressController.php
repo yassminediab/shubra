@@ -109,6 +109,21 @@ class AddressController extends ApiController
         return $this->respondSuccess('Address updated successfully',$address);
     }
 
+    public function verifyAddress(Request $request,$id)
+    {
+        $validator = Validator::make($request->all(), [
+            'code' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->respondBadRequest("", ['errors' => $validator->errors()]);
+        }
+
+        $address = Address::where('id' , $id)->update(['isVerified' => true]);
+
+        return $this->respondSuccess('Address updated successfully',$address);
+    }
+
     public function listCities()
     {
         $cities = City::get();

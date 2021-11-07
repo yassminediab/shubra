@@ -4,9 +4,12 @@ namespace App\Http\Controllers\API;
 
 use App\Cart;
 use App\CartProduct;
+use App\Coupon;
 use App\Product;
 use App\Transformers\CartTransformer;
 use App\Transformers\ProductTransformer;
+use App\Voucher;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Saad\Fractal\Fractal;
@@ -86,6 +89,69 @@ class CartController extends ApiController
         ]);
 
         return $this->respondSuccess('Product deleted successfully');
+    }
+
+    public function addCouponToCart(Request $request, $id) {
+        $validator = Validator::make($request->all(), [
+            'coupon' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->respondBadRequest("", ['errors' => $validator->errors()]);
+        }
+
+        $cart = Cart::find($id);
+
+        $coupon = Coupon::where('user_id', $request->user()->id)->where('coupon',$request->coupon)->where('start_date','<=', Carbon::today())->where('end_date','>=',Carbon::today())->first();
+        if(!$coupon) {
+            return $this->respondNotAcceptable('Invalid or Expired Coupon');
+        }
+
+        $cartProduct = CartProduct::where('cart_id',$id)->where('product_id',$coupon->product_id)->first();
+        if(!$cartProduct) {
+            return $this->respondNotAcceptable('Product of this coupon not added to cart');
+        }
+
+        $discountedValue = $cartProduct->price_after_discount * $coupon->discount /100;
+        $cartProduct->price_after_discount = $cartProduct->price_after_discount - $discountedValue;
+        $cartProduct->save();
+
+        $cart->discount = $cart->discount + $discountedValue;
+        $cart->total_price = $cart->total_price - $discountedValue;
+        $cart->coupon = $request->coupon;
+        $cart->save();
+
+        return $this->respondSuccess('Coupon added successfully',$cart);
+    }
+
+    public function addVoucherToCart(Request $request, $id) {
+        $validator = Validator::make($request->all(), [
+            'voucher' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->respondBadRequest("", ['errors' => $validator->errors()]);
+        }
+
+        $cart = Cart::find($id);
+
+        $coupon = Voucher::where('user_id', $request->user()->id)->where('voucher_code',$request->voucher)->where('start_date','<=', Carbon::today())->where('end_date','>=',Carbon::today())->where('is_used',false)->first();
+        if(!$coupon) {
+            return $this->respondNotAcceptable('Invalid or Expired voucher or used before');
+        }
+
+        $cart->discount = $cart->discount + $coupon->voucher_amount;
+        $cart->total_price = $cart->total_price - $coupon->voucher_amount;
+        if($cart->total_price < 0) {
+            $cart->total_price = 0;
+        }
+        $cart->voucher = $request->voucher;
+        $cart->save();
+
+        $coupon->is_used = 1;
+        $coupon->save();
+
+        return $this->respondSuccess('Voucher added successfully',$cart);
     }
 
 }

@@ -78,7 +78,7 @@ class ProductController extends ApiController
         ];
         return $this->respondPaginated('Review returned successfully',
             ['reviews' => $transformedReviews, 'rates' => $rates,'product_rate' => $product->rate],
-            $reviews, null);
+            $reviews);
     }
 
     public function getProduct($id)
@@ -105,5 +105,17 @@ class ProductController extends ApiController
         $user->wishlist()->attach([$id]);
 
         return $this->respondSuccess('Wishlist created successfully');
+    }
+
+    public function getCategoryProducts($id) {
+        $products = Product::with(['offers'=> function($query) {
+            $query->latest()->first();
+        }])->whereHas('categories',function ($query) use ($id) {
+            $query->where('categories.id',$id);
+        })->paginate(6);
+
+        $transformedSimilarProduct = Fractal::create($products, new ProductTransformer())->toArray();
+        return $this->respondPaginated('product returned successfully',['products' => $transformedSimilarProduct],$products);
+
     }
 }

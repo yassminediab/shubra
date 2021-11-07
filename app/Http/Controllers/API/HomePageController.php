@@ -33,14 +33,21 @@ class HomePageController extends ApiController
         $productsDiscounted = Fractal::create($productsDiscounted->discountedProducts, new OfferTransformer());
 
         return $this->respondSuccess('Home Page returned successfully', [
-            'sliders' => $sliders,
-            'product_in_offer'=> $offerProducts,
-            'categories' => $categories,
-            'mostly_view' => $mostlyView,
-            'product_in_discounted' => $productsDiscounted,
-            'brands' => $brands,
-            'top_products' => $topProducts
-
+            $this->getHomePageObject('topSlider','sliderList',$sliders,1),
+            $this->getHomePageObject('specialOffer','specialOfferList',$offerProducts,2),
+            $this->getHomePageObject('category','categoryList',$categories,3),
+            $this->getHomePageObject('mostlyViewed','mostlyViewedList',$mostlyView,4),
+            $this->getHomePageObject('brand','brandList',$brands,5),
+            $this->getHomePageObject('discount','discountList',$productsDiscounted,6),
+            $this->getHomePageObject('topProduct','topProductList',$topProducts,7),
         ]);
+    }
+
+    public function getHomePageObject($type, $arrayName, $array, $sort) {
+        return [
+            'type' => $type,
+            'sort' => $sort,
+            $arrayName => $array
+        ];
     }
 }

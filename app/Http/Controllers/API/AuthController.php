@@ -87,7 +87,8 @@ class AuthController extends ApiController
             return $this->respondBadRequest("", ['errors' => $validator->errors()]);
         }
 
-        $user = User::where('phone' , $request->phone)->update(['is_active' => true]);
+        $user = User::where('phone' , $request->phone)->first();
+        User::where('phone' , $request->phone)->update(['is_active' => true]);
         $user = Fractal::create($user, new UserTransformer());
 
         return $this->respondAccepted("User verified successfully", ['user' => $user]);

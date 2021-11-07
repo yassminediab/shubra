@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Address;
 use App\Cart;
 use App\CartProduct;
 use App\Order;
@@ -14,6 +15,7 @@ use App\Transformers\CartTransformer;
 use App\Transformers\OrderTransformer;
 use App\Transformers\ProductTransformer;
 use Carbon\Carbon;
+use Carbon\CarbonPeriod;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
@@ -27,7 +29,8 @@ class OrderController extends ApiController
             'cart_id' => 'required|exists:carts,id',
             'address_id' => 'required|exists:addresses,id',
             'payment_method' => 'required',
-            'delivery_time' => 'required|date|after:today',
+            'delivery_date' => 'required|date|after:today',
+            'time_slot' => 'required',
         ]);
 
         if ($validator->fails()) {
@@ -39,6 +42,12 @@ class OrderController extends ApiController
         if(!$cart) {
             return $this->respondNotFound('Cart not found');
         }
+
+        $address = Address::find($request->address_id);
+        if(!$address->user_id && !$address->isVerified) {
+            return $this->respondNotAcceptable("Address is not verified");
+        }
+        $createdAddress = Address::create($address->toArray());
         $delivery_fee = Setting::first()->delivery_fee;
         $order = Order::create([
             'transaction_id' =>  Str::random(8),
@@ -48,8 +57,9 @@ class OrderController extends ApiController
             'price' => $cart->price,
             'total_items' => $cart->total_items,
             'total_item_price' => $cart->total_price,
-            'delivery_time' => $request->delivery_time,
-            'address_id' => $request->address_id,
+            'delivery_date' => $request->delivery_date,
+            'delivery_slot' => $request->time_slot,
+            'address_id' => $createdAddress->id,
             'payment_method' => $request->payment_method,
             'current_status' => 'confirmed',
             'delivery_fee' => $delivery_fee,
@@ -87,6 +97,15 @@ class OrderController extends ApiController
         }
         $transformedOrder = Fractal::create($order, new OrderTransformer());
         return $this->respondSuccess('',$transformedOrder);
+    }
+
+    public function getAvailableTimeSlots($date) {
+        $period = new CarbonPeriod('07:00', '60 minutes', '24:00'); // for create use 24 hours format later change format
+        $slots = [];
+        foreach($period as $item){
+            array_push($slots,['time_slot' => $item->format("h:i A"), 'is_available' => true]);
+        }
+        return $this->respondAccepted('',$slots);
     }
 
     public function listOrders(Request $request)
@@ -156,5 +175,11 @@ class OrderController extends ApiController
             ]);
 
         return $this->respondSuccess('Delivery rated successfully');
+    }
+
+    public function cancelOrder($id){
+        Order::where('id', $id)->update(['current_status' => 'canceled']);
+        OrderStatus::create(['order_id' => $id, 'status' => 'canceled', 'date' => Carbon::now()]);
+        return $this->respondSuccess('Order canceled successfully');
     }
 }
