@@ -27,6 +27,11 @@ class Product extends Model
         return $this->hasMany(ProductReview::class);
     }
 
+    public function images()
+    {
+        return $this->hasMany(ProductImage::class);
+    }
+
     public function scopeHasOffer($query)
     {
         return $query->has('offers');

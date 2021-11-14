@@ -9,7 +9,7 @@ use Saad\Fractal\Transformers\TransformerAbstract;
 
 class ProductReviewTransformer extends TransformerAbstract
 {
-    protected $defaultIncludes = ['id','rate', 'comment', 'user'];
+    protected $defaultIncludes = ['id','rate', 'comment', 'user', 'date'];
 
     public function includeId(ProductReview $review)
     {
@@ -24,6 +24,11 @@ class ProductReviewTransformer extends TransformerAbstract
     public function includeRate(ProductReview $review)
     {
         return $this->primitive($review->rate);
+    }
+
+    public function includeDate(ProductReview $review)
+    {
+        return $this->primitive($review->created_at);
     }
 
     public function includeUser(ProductReview $review)

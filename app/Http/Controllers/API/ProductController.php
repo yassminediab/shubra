@@ -51,8 +51,13 @@ class ProductController extends ApiController
 
         $groupedRates = DB::table('product_reviews')
             ->select('rate', DB::raw('count(*) as count'))
+            ->where('product_id',$product->id)
             ->groupBy('rate')
             ->get()->keyBy('rate');
+
+        $count = DB::table('product_reviews')
+            ->where('product_id',$product->id)
+            ->count();
 
         $rates = [
             [
@@ -77,7 +82,7 @@ class ProductController extends ApiController
             ]
         ];
         return $this->respondPaginated('Review returned successfully',
-            ['reviews' => $transformedReviews, 'rates' => $rates,'product_rate' => $product->rate],
+            ['reviews' => $transformedReviews, 'rates' => $rates,'product_rate' => $product->rate, 'review_count' => $count],
             $reviews);
     }
 
@@ -85,7 +90,7 @@ class ProductController extends ApiController
     {
         $product = Product::with(['offers'=> function($query) {
             $query->latest()->first();
-        }])->find($id);
+        }, 'images'])->find($id);
         $transformedProduct = Fractal::create($product, new ProductTransformer());
 
         $similarProducts = Product::with(['offers'=> function($query) {
@@ -110,9 +115,19 @@ class ProductController extends ApiController
     public function getCategoryProducts($id) {
         $products = Product::with(['offers'=> function($query) {
             $query->latest()->first();
-        }])->whereHas('categories',function ($query) use ($id) {
+        },'images'])->whereHas('categories',function ($query) use ($id) {
             $query->where('categories.id',$id);
         })->paginate(6);
+
+        $transformedSimilarProduct = Fractal::create($products, new ProductTransformer())->toArray();
+        return $this->respondPaginated('product returned successfully',['products' => $transformedSimilarProduct],$products);
+
+    }
+
+    public function searchProducts(Request $request) {
+        $products = Product::with(['offers'=> function($query) {
+            $query->latest()->first();
+        },'images'])->where('name','like','%'.$request->input('query').'%')->paginate(6);
 
         $transformedSimilarProduct = Fractal::create($products, new ProductTransformer())->toArray();
         return $this->respondPaginated('product returned successfully',['products' => $transformedSimilarProduct],$products);

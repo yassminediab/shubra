@@ -34,6 +34,7 @@ Route::post('products/{id}/reviews', 'API\ProductController@reviewProduct')->mid
 Route::get('products/{id}/reviews', 'API\ProductController@getProductReviews');
 Route::get('categories/{id}/products', 'API\ProductController@getCategoryProducts');
 Route::get('products/{id}', 'API\ProductController@getProduct');
+Route::get('products', 'API\ProductController@searchProducts');
 Route::post('/products/{id}/wishlist', 'API\ProductController@wishlistProduct')->middleware('jwt.auth');
 
 Route::post('carts/{id?}', 'API\CartController@addToCart')->middleware('jwt.verify');
