@@ -125,6 +125,10 @@ class ApiController extends Controller
      */
     public function respondBadRequest($message = 'Not Acceptable', $errors = [])
     {
+        $error_values = array_values($errors['errors']->toArray());
+        if(isset($error_values[0][0])) {
+            $errors = $error_values[0][0];
+        }
         return $this->setStatusCode(400)->respondWithError($message,$errors);
     }
 }
