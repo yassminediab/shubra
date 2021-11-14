@@ -47,7 +47,7 @@ class HomePageController extends ApiController
         return [
             'type' => $type,
             'sort' => $sort,
-            $arrayName => $array
+            'key' => $array
         ];
     }
 }
