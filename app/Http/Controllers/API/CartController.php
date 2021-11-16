@@ -6,6 +6,7 @@ use App\Cart;
 use App\CartProduct;
 use App\Coupon;
 use App\Product;
+use App\Setting;
 use App\Transformers\CartTransformer;
 use App\Transformers\ProductTransformer;
 use App\Voucher;
@@ -30,10 +31,12 @@ class CartController extends ApiController
         $user = $request->user();
 
         $cart = Cart::find($id);
-
+        $fees = 0;
         if(!$cart) {
+            $fees = Setting::first()->delivery_fee;
             $cart = Cart::create([
-                'user_id' => $user ? $user->id : null
+                'user_id' => $user ? $user->id : null,
+                'fees' => $fees,
             ]);
         }
         $product = Product::with(['offers'=> function($query) {
@@ -59,7 +62,7 @@ class CartController extends ApiController
             'total_items' => $cart->total_items + $request->quantity,
             'weight' => $cart->weight + $request->quantity,
             'discount' => $cart->discount + $price*$discount/100,
-            'total_price' => $cart->total_price + $price_after_discount,
+            'total_price' => $cart->total_price + $price_after_discount + $fees,
         ]);
 
         return $this->respondSuccess('Cart created successfully',$cart);
@@ -118,6 +121,7 @@ class CartController extends ApiController
 
         $cart->discount = $cart->discount + $discountedValue;
         $cart->total_price = $cart->total_price - $discountedValue;
+        $cart->coupon_value = $discountedValue;
         $cart->coupon = $request->coupon;
         $cart->save();
 
@@ -146,6 +150,7 @@ class CartController extends ApiController
             $cart->total_price = 0;
         }
         $cart->voucher = $request->voucher;
+        $cart->voucher_value = $coupon->voucher_amount;
         $cart->save();
 
         $coupon->is_used = 1;

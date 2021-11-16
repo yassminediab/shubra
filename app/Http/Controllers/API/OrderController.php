@@ -63,7 +63,7 @@ class OrderController extends ApiController
             'payment_method' => $request->payment_method,
             'current_status' => 'confirmed',
             'delivery_fee' => $delivery_fee,
-            'total_price' => $cart->total_price+$delivery_fee,
+            'total_price' => $cart->total_price,
         ]);
         $cart_products = CartProduct::where('cart_id',$cart->id)->get();
         foreach ($cart_products as $cart_product) {
