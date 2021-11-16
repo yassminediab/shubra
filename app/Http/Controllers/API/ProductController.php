@@ -93,6 +93,9 @@ class ProductController extends ApiController
         }, 'images'])->find($id);
         $transformedProduct = Fractal::create($product, new ProductTransformer());
 
+        $product->number_of_views = $product->number_of_views +1;
+        $product->save();
+
         $similarProducts = Product::with(['offers'=> function($query) {
             $query->latest()->first();
         }])->whereHas('categories',function ($query) use ($product) {
@@ -112,12 +115,15 @@ class ProductController extends ApiController
         return $this->respondSuccess('Wishlist created successfully');
     }
 
-    public function getCategoryProducts($id) {
+    public function getCategoryProducts($id, Request $request) {
+        $query = $request->query;
+        $sort_field = $query->sort_by ?? 'created_at';
+        $sort = $query->sort ?? 'desc';
         $products = Product::with(['offers'=> function($query) {
             $query->latest()->first();
         },'images'])->whereHas('categories',function ($query) use ($id) {
             $query->where('categories.id',$id);
-        })->paginate(6);
+        })->orderBy($sort_field)->orderBy($sort)->paginate(6);
 
         $transformedSimilarProduct = Fractal::create($products, new ProductTransformer())->toArray();
         return $this->respondPaginated('product returned successfully',['products' => $transformedSimilarProduct],$products);
