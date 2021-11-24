@@ -59,6 +59,9 @@ Route::get('orders', 'API\OrderController@listOrders')->middleware('jwt.auth');
 Route::post('orders/{id}/feedback', 'API\OrderController@rateOrder')->middleware('jwt.verify');
 Route::post('orders/{id}/delivery-feedback', 'API\OrderController@rateDelivery')->middleware('jwt.verify');
 Route::post('orders/{id}/cancel', 'API\OrderController@cancelOrder')->middleware('jwt.auth');
+Route::post('orders/{id}/products/{productId}/prepare', 'API\OrderController@prepareItemInOrder')->middleware('jwt.auth');
+Route::post('orders/{id}/products/{productId}/issue', 'API\OrderController@issueItemInOrder')->middleware('jwt.auth');
+Route::post('orders/{id}/packages', 'API\OrderController@addPackagesToOrder')->middleware('jwt.auth');
 
 Route::get('/wishlist', 'API\UserController@getWishlist')->middleware('jwt.auth');
 Route::put('/profile', 'API\UserController@editProfile')->middleware('jwt.auth');

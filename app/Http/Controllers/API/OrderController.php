@@ -182,4 +182,36 @@ class OrderController extends ApiController
         OrderStatus::create(['order_id' => $id, 'status' => 'canceled', 'date' => Carbon::now()]);
         return $this->respondSuccess('Order canceled successfully');
     }
+
+    public function prepareItemInOrder($id,$productId) {
+        OrderProduct::where('order_id', $id)->where('product_id', $productId)->update(['is_prepared'=> true]);
+        return $this->respondSuccess('Item prepared successfully');
+    }
+
+    public function issueItemInOrder($id,$productId, Request $request) {
+        $validator = Validator::make($request->all(), [
+            'issue' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->respondBadRequest("", ['errors' => $validator->errors()]);
+        }
+
+        OrderProduct::where('order_id', $id)->where('product_id', $productId)->update(['issue'=> $request->issue]);
+        return $this->respondSuccess('Issue reported successfully');
+    }
+
+    public function addPackagesToOrder($id, Request $request) {
+        $validator = Validator::make($request->all(), [
+            'packages' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->respondBadRequest("", ['errors' => $validator->errors()]);
+        }
+
+        Order::where('id', $id)->update(['packages' => $request->packages]);
+
+        return $this->respondSuccess('Packages reported successfully');
+    }
 }

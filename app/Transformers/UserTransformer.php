@@ -21,7 +21,7 @@ class UserTransformer extends TransformerAbstract
      * Default Includes
      * @var array
      */
-    protected $defaultIncludes = ['id', 'name' , 'avatar', 'email', 'phone','last_name' , 'date_of_birth','title'];
+    protected $defaultIncludes = ['id', 'name' , 'avatar', 'email', 'phone','last_name' , 'date_of_birth','title', 'type'];
 
     /**
      * @param UserEntity $user
@@ -80,6 +80,11 @@ class UserTransformer extends TransformerAbstract
     public function includeTitle(User $user)
     {
         return $this->primitive($user->title);
+    }
+
+    public function includeType(User $user)
+    {
+        return $this->primitive($user->type);
     }
 
 }

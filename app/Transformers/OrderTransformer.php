@@ -9,7 +9,7 @@ use Saad\Fractal\Transformers\TransformerAbstract;
 
 class OrderTransformer extends TransformerAbstract
 {
-    protected $defaultIncludes = ['id','transaction_id','price','weight','discount','total_items','total_price','products','delivery_time','delivery_fee','current_status','address','payment_method','total_item_price','statuses'];
+    protected $defaultIncludes = ['id','transaction_id','price','weight','discount','total_items','total_price','products','delivery_time','delivery_fee','current_status','address','payment_method','total_item_price','statuses', 'packages'];
 
     public function includeId(Order $order)
     {
@@ -83,5 +83,10 @@ class OrderTransformer extends TransformerAbstract
     public function includeStatuses(Order $order)
     {
         return $this->collection($order->statuses, new OrderStatusTransformer());
+    }
+
+    public function includePackages(Order $order)
+    {
+        return $this->primitive($order->packages);
     }
 }

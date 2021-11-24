@@ -9,7 +9,7 @@ use Saad\Fractal\Transformers\TransformerAbstract;
 
 class OrderProductTransformer extends TransformerAbstract
 {
-    protected $defaultIncludes = ['id','name','price', 'image','size_per_unit','unit_of_measure','quantity','price_after_discount'];
+    protected $defaultIncludes = ['id','name','price', 'image','size_per_unit','unit_of_measure','quantity','price_after_discount', 'is_prepared','issue'];
 
     public function includeId(OrderProduct $product)
     {
@@ -34,6 +34,16 @@ class OrderProductTransformer extends TransformerAbstract
     public function includePriceAfterDiscount(OrderProduct $product)
     {
         return $this->primitive($product->price_after_discount);
+    }
+
+    public function includeIsPrepared(OrderProduct $product)
+    {
+        return $this->primitive($product->is_prepared);
+    }
+
+    public function includeIssue(OrderProduct $product)
+    {
+        return $this->primitive($product->issue);
     }
 
     public function includeQuantity(OrderProduct $product)

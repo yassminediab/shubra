@@ -116,14 +116,27 @@ class ProductController extends ApiController
     }
 
     public function getCategoryProducts($id, Request $request) {
-        $query = $request->query;
-        $sort_field = $query->sort_by ?? 'created_at';
-        $sort = $query->sort ?? 'desc';
+        $sort_field = $request->input('sort_by') ?? 'created_at';
+        $sort = $request->input('sort') ?? 'desc';
         $products = Product::with(['offers'=> function($query) {
             $query->latest()->first();
         },'images'])->whereHas('categories',function ($query) use ($id) {
             $query->where('categories.id',$id);
-        })->orderBy($sort_field)->orderBy($sort)->paginate(6);
+        });
+
+        if($request->input('min_price') && $request->input('max_price')) {
+            $products = $products->whereBetween('price',[$request->input('min_price'), $request->input('max_price')]);
+        }
+
+        if($request->input('rate')) {
+            $products = $products->whereIn('rate',explode(',',$request->input('rate')));
+        }
+
+        if($request->input('query')) {
+            $products = $products->where('name','like','%'.$request->input('query').'%');
+        }
+
+        $products = $products->orderBy($sort_field,$sort)->paginate(6);
 
         $transformedSimilarProduct = Fractal::create($products, new ProductTransformer())->toArray();
         return $this->respondPaginated('product returned successfully',['products' => $transformedSimilarProduct],$products);
