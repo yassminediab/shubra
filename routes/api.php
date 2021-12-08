@@ -17,11 +17,12 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
-Route::get('categories/{id?}', 'API\CategoryController@index')->middleware('localization');
-Route::get('homepage', 'API\HomePageController@index')->middleware('localization');
-Route::get('offers/type', 'API\OfferController@getOffersWithTypes')->middleware('localization');
-Route::get('offers', 'API\OfferController@index')->middleware('localization');
-Route::get('offers/{id}', 'API\OfferController@show')->middleware('localization');
+Route::get('categories/{id?}', 'API\CategoryController@index')->middleware('localization')->middleware('jwt.verify');
+Route::get('homepage', 'API\HomePageController@index')->middleware('localization')->middleware('jwt.verify');
+Route::get('homepage/{type}', 'API\HomePageController@getHomePageByType')->middleware('localization')->middleware('jwt.verify');
+Route::get('offers/type', 'API\OfferController@getOffersWithTypes')->middleware('localization')->middleware('jwt.verify');
+Route::get('offers', 'API\OfferController@index')->middleware('localization')->middleware('jwt.verify');
+Route::get('offers/{id}', 'API\OfferController@show')->middleware('localization')->middleware('jwt.verify');
 
 Route::get('coupons', 'API\CouponController@index')->middleware('localization')->middleware('jwt.auth');
 Route::get('coupons/{id}', 'API\CouponController@get')->middleware('localization')->middleware('jwt.auth');
@@ -31,22 +32,22 @@ Route::post('register', 'API\AuthController@register');
 Route::post('users/verify', 'API\AuthController@verifyUser');
 
 Route::post('products/{id}/reviews', 'API\ProductController@reviewProduct')->middleware('jwt.auth');
-Route::get('products/{id}/reviews', 'API\ProductController@getProductReviews');
-Route::get('categories/{id}/products', 'API\ProductController@getCategoryProducts');
-Route::get('products/{id}', 'API\ProductController@getProduct');
-Route::get('products', 'API\ProductController@searchProducts');
+Route::get('products/{id}/reviews', 'API\ProductController@getProductReviews')->middleware('jwt.verify');
+Route::get('categories/{id}/products', 'API\ProductController@getCategoryProducts')->middleware('jwt.verify');
+Route::get('products/{id}', 'API\ProductController@getProduct')->middleware('jwt.verify');
+Route::get('products', 'API\ProductController@searchProducts')->middleware('jwt.verify');
 Route::post('/products/{id}/wishlist', 'API\ProductController@wishlistProduct')->middleware('jwt.auth');
 
 Route::post('carts/{id?}', 'API\CartController@addToCart')->middleware('jwt.verify');
 Route::get('carts/{id}', 'API\CartController@getCart');
 Route::post('carts/{id}/coupons', 'API\CartController@addCouponToCart')->middleware('jwt.auth');
 Route::post('carts/{id}/vouchers', 'API\CartController@addVoucherToCart')->middleware('jwt.auth');
-Route::delete('carts/{id}/products/{productId}', 'API\CartController@deleteCart');
+Route::get('carts/{id}/products/{productId}', 'API\CartController@deleteCart');
 
 Route::post('addresses', 'API\AddressController@createAddress')->middleware('jwt.verify');
 Route::get('addresses', 'API\AddressController@getAddresses')->middleware('jwt.auth');
 Route::get('addresses/{id}', 'API\AddressController@getAddress')->middleware('jwt.verify');
-Route::delete('addresses/{id}', 'API\AddressController@deleteAddress')->middleware('jwt.auth');
+Route::get('addresses/{id}', 'API\AddressController@deleteAddress')->middleware('jwt.auth');
 Route::put('addresses/{id}', 'API\AddressController@editAddress')->middleware('jwt.auth');
 Route::put('addresses/{id}/verify', 'API\AddressController@verifyAddress')->middleware('jwt.verify');
 Route::get('cities', 'API\AddressController@listCities')->middleware('jwt.verify');
@@ -70,11 +71,3 @@ Route::put('/phone', 'API\UserController@editPhone')->middleware('jwt.auth');
 Route::put('/password', 'API\UserController@editPassword')->middleware('jwt.auth');
 Route::post('/avatar', 'API\UserController@editAvatar')->middleware('jwt.auth');
 Route::get('/profile', 'API\UserController@getProfile')->middleware('jwt.auth');
-
-
-
-
-
-
-
-

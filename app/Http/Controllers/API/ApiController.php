@@ -51,7 +51,7 @@ class ApiController extends Controller
      * @param string $msg
      * @return \Illuminate\Http\JsonResponse
      */
-    public function respondNotAcceptable($msg = 'Not Acceptable', $errors = [])
+    public function respondNotAcceptable($msg = 'Not Acceptable', $errors = null)
     {
         return $this->setStatusCode(406)->respondWithError($msg, $errors, 406);
     }
@@ -60,7 +60,7 @@ class ApiController extends Controller
      * @param $msg
      * @return \Illuminate\Http\JsonResponse
      */
-    public function respondWithError($msg, $errors = [],$code = 400)
+    public function respondWithError($msg, $errors = null,$code = 400)
     {
         return $this->respond(["status" => false, "message" => $msg, "error" => $errors, 'data' => [],"code" => $code]);
     }
@@ -73,7 +73,7 @@ class ApiController extends Controller
      */
     public function respondCreated($msg = "", $data = [])
     {
-        return $this->setStatusCode(201)->respondSuccess($msg, $data);
+        return $this->setStatusCode(200)->respondSuccess($msg, $data);
     }
 
     /**
@@ -81,9 +81,9 @@ class ApiController extends Controller
      * @param array $data
      * @return \Illuminate\Http\JsonResponse
      */
-    public function respondAccepted($msg, $data = [])
+    public function respondAccepted($msg, $data = null)
     {
-        return $this->setStatusCode(202)->respondSuccess($msg, $data);
+        return $this->setStatusCode(200)->respondSuccess($msg, $data);
     }
 
     /**
@@ -92,7 +92,7 @@ class ApiController extends Controller
      * @param array $data
      * @return \Illuminate\Http\JsonResponse
      */
-    public function respondSuccess($msg = '', $data = [],$code = 200)
+    public function respondSuccess($msg = '', $data = null,$code = 200)
     {
         return $this->respond(["status" => true, "data" => $data, 'message' => $msg, 'error' => [], "code" => $code]);
     }
@@ -128,6 +128,9 @@ class ApiController extends Controller
         $error_values = array_values($errors['errors']->toArray());
         if(isset($error_values[0][0])) {
             $errors = $error_values[0][0];
+        }
+        else {
+            $errors = null;
         }
         return $this->setStatusCode(400)->respondWithError($message,$errors);
     }

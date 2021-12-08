@@ -48,7 +48,6 @@ class OrderController extends ApiController
             return $this->respondNotAcceptable("Address is not verified");
         }
         $createdAddress = Address::create($address->toArray());
-        $delivery_fee = Setting::first()->delivery_fee;
         $order = Order::create([
             'transaction_id' =>  Str::random(8),
             'customer_id' => $user ?  $user->id : null,
@@ -62,7 +61,12 @@ class OrderController extends ApiController
             'address_id' => $createdAddress->id,
             'payment_method' => $request->payment_method,
             'current_status' => 'confirmed',
-            'delivery_fee' => $delivery_fee,
+            'coupon' => $cart->coupon,
+            'voucher' => $cart->voucher,
+            'coupon_value' => $cart->coupon_value,
+            'voucher_value' => $cart->voucher_value,
+            'total_products_price' => $cart->total_products_price,
+            'vat' => $cart->vat,
             'total_price' => $cart->total_price,
         ]);
         $cart_products = CartProduct::where('cart_id',$cart->id)->get();

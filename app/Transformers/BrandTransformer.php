@@ -22,6 +22,6 @@ class BrandTransformer extends TransformerAbstract
 
     public function includeImage(Brand $brand)
     {
-        return $this->primitive($brand->image);
+        return $this->primitive(getImageUrl($brand->image));
     }
 }

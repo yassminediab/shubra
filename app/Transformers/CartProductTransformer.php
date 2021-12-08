@@ -22,12 +22,12 @@ class CartProductTransformer extends TransformerAbstract
 
     public function includeImage(CartProduct $product)
     {
-        return $this->primitive($product->product->image);
+        return $this->primitive(getImageUrl($product->product->image));
     }
 
     public function includePrice(CartProduct $product)
     {
-        return $this->primitive($product->price);
+        return $this->primitive((float)$product->price);
     }
 
     public function includePriceAfterDiscount(CartProduct $product)

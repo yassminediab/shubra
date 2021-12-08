@@ -23,7 +23,7 @@ class OrderProductTransformer extends TransformerAbstract
 
     public function includeImage(OrderProduct $product)
     {
-        return $this->primitive($product->product->image);
+        return $this->primitive(getImageUrl($product->product->image));
     }
 
     public function includePrice(OrderProduct $product)

@@ -22,7 +22,7 @@ class SliderTransformer extends TransformerAbstract
 
     public function includeImage(Slider $slider)
     {
-        return $this->primitive($slider->image);
+        return $this->primitive(getImageUrl($slider->image));
     }
 
     public function includeButtonTitle(Slider $slider)

@@ -15,4 +15,8 @@ class Category extends Model
     {
         return $this->hasMany(Category::class, 'parent');
     }
+
+    public function homePage() {
+        return $this->belongsToMany(HomePage::class, 'homepage_category');
+    }
 }

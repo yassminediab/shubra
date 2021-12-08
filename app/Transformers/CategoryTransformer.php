@@ -30,7 +30,7 @@ class CategoryTransformer extends TransformerAbstract
 
     public function includeImage(Category $category)
     {
-        return $this->primitive($category->image);
+        return $this->primitive(getImageUrl($category->image));
     }
 
     public function includeChildrenCount(Category $category)

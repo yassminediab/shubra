@@ -31,9 +31,10 @@ class CartController extends ApiController
         $user = $request->user();
 
         $cart = Cart::find($id);
-        $fees = 0;
+        $setting = Setting::first();
+        $fees = $setting->delivery_fee;
+        $vat = $setting->vat;
         if(!$cart) {
-            $fees = Setting::first()->delivery_fee;
             $cart = Cart::create([
                 'user_id' => $user ? $user->id : null,
                 'fees' => $fees,
@@ -57,15 +58,46 @@ class CartController extends ApiController
             'price_after_discount' => $price_after_discount,
         ]);
 
-        Cart::where('id',$cart->id)->update([
-            'price' => $cart->price + $price,
-            'total_items' => $cart->total_items + $request->quantity,
-            'weight' => $cart->weight + $request->quantity,
-            'discount' => $cart->discount + $price*$discount/100,
-            'total_price' => $cart->total_price + $price_after_discount + $fees,
-        ]);
+        $this->refreshCart($cart->id,$fees, $vat);
 
-        return $this->respondSuccess('Cart created successfully',$cart);
+        $cart = Cart::with('products.product')->find($cart->id);
+        $transformedCart = Fractal::create($cart, new CartTransformer());
+
+        return $this->respondSuccess('Cart created successfully',$transformedCart);
+    }
+
+    public function refreshCart($id, $fees, $vat) {
+        $cart = Cart::find($id);
+        $cartProducts = CartProduct::where('cart_id', $id)->get();
+        $total_price = 0;
+        $cart_price = 0;
+        $cart_discount = 0;
+        $total_items =0;
+        foreach ($cartProducts as $cartProduct) {
+            $total_price+=$cartProduct->price_after_discount;
+            $cart_price+=$cartProduct->price;
+            $cart_discount+=($cartProduct->price - $cartProduct->price_after_discount);
+            $total_items+=$cartProduct->quantity;
+        }
+        $coupon_amount = $cart->coupon_value;
+        $voucher_amount = $cart->voucher_value;
+        $total_cart_price = $total_price + $fees - $coupon_amount - $voucher_amount;
+        if($total_cart_price < 0) {
+            $total_cart_price = 0;
+        }
+
+        $vatValue = $total_cart_price * $vat/100;
+        $total_cart_price = $total_cart_price + $vatValue;
+
+        Cart::where('id',$id)->update([
+            'price' => $cart_price,
+            'total_items' => $total_items,
+            'weight' => $total_items,
+            'discount' => $cart_discount,
+            'total_price' => $total_cart_price,
+            'total_products_price' => $total_price,
+            'vat' => $vatValue
+        ]);
     }
 
     public function getCart($id) {
@@ -82,6 +114,12 @@ class CartController extends ApiController
         }
 
         $cartProduct->delete();
+
+        $setting = Setting::first();
+        $fees = $setting->delivery_fee;
+        $vat = $setting->vat;
+
+        $this->refreshCart($id,$fees, $vat);
 
         Cart::where('id',$id)->update([
             'price' => $cart->price - $cartProduct->price,
@@ -116,14 +154,17 @@ class CartController extends ApiController
         }
 
         $discountedValue = $cartProduct->price_after_discount * $coupon->discount /100;
-        $cartProduct->price_after_discount = $cartProduct->price_after_discount - $discountedValue;
         $cartProduct->save();
 
-        $cart->discount = $cart->discount + $discountedValue;
-        $cart->total_price = $cart->total_price - $discountedValue;
         $cart->coupon_value = $discountedValue;
         $cart->coupon = $request->coupon;
         $cart->save();
+
+        $setting = Setting::first();
+        $fees = $setting->delivery_fee;
+        $vat = $setting->vat;
+
+        $this->refreshCart($id,$fees, $vat);
 
         return $this->respondSuccess('Coupon added successfully',$cart);
     }
@@ -144,17 +185,18 @@ class CartController extends ApiController
             return $this->respondNotAcceptable('Invalid or Expired voucher or used before');
         }
 
-        $cart->discount = $cart->discount + $coupon->voucher_amount;
-        $cart->total_price = $cart->total_price - $coupon->voucher_amount;
-        if($cart->total_price < 0) {
-            $cart->total_price = 0;
-        }
         $cart->voucher = $request->voucher;
         $cart->voucher_value = $coupon->voucher_amount;
         $cart->save();
 
         $coupon->is_used = 1;
         $coupon->save();
+
+        $setting = Setting::first();
+        $fees = $setting->delivery_fee;
+        $vat = $setting->vat;
+
+        $this->refreshCart($id,$fees, $vat);
 
         return $this->respondSuccess('Voucher added successfully',$cart);
     }

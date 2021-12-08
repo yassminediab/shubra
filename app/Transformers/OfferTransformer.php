@@ -10,6 +10,16 @@ class OfferTransformer extends TransformerAbstract
     protected $defaultIncludes = ['id','title', 'image', 'description', 'type'];
     protected $availableIncludes = ['products'];
 
+    protected $cartProductIds;
+
+    protected $wishlistProductIds;
+
+    public function __construct($cartProductIds = [], $wishlistProductIds = [])
+    {
+        $this->cartProductIds = $cartProductIds;
+        $this->wishlistProductIds = $wishlistProductIds;
+    }
+
     public function includeId(Offer $offer)
     {
         return $this->primitive($offer->id);
@@ -27,7 +37,7 @@ class OfferTransformer extends TransformerAbstract
 
     public function includeImage(Offer $offer)
     {
-        return $this->primitive($offer->image);
+        return $this->primitive(getImageUrl($offer->image));
     }
 
     public function includeType(Offer $offer)
@@ -37,6 +47,6 @@ class OfferTransformer extends TransformerAbstract
 
     public function includeProducts(Offer $offer)
     {
-        return $this->collection($offer->products, new ProductTransformer());
+        return $this->collection($offer->products, new ProductTransformer($this->cartProductIds, $this->wishlistProductIds));
     }
 }

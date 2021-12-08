@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\API;
 
+use App\CartProduct;
 use App\Offer;
 use App\Product;
 use App\ProductReview;
@@ -86,12 +87,23 @@ class ProductController extends ApiController
             $reviews);
     }
 
-    public function getProduct($id)
+    public function getProduct($id, Request $request)
     {
+        $cartProductIds = [];
+        if($request->input('cart_id')) {
+            $cartProductIds = CartProduct::where('cart_id', $request->input('cart_id'))->get()->pluck('quantity','product_id')->toArray();
+        }
+
+        $user = $request->user();
+        $wishlistProductIds = [];
+        if($user) {
+            $wishlistProductIds = $user->wishlist->pluck('id')->toArray();
+        }
+
         $product = Product::with(['offers'=> function($query) {
             $query->latest()->first();
         }, 'images'])->find($id);
-        $transformedProduct = Fractal::create($product, new ProductTransformer());
+        $transformedProduct = Fractal::create($product, new ProductTransformer($cartProductIds, $wishlistProductIds));
 
         $product->number_of_views = $product->number_of_views +1;
         $product->save();

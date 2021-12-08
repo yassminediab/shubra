@@ -10,7 +10,7 @@ class Product extends Model
     use Translatable;
     protected $translatable = ['name', 'description', 'meta_description', 'meta_title', 'meta_keyword','tag'];
     protected $fillable = ['id','name','description', 'meta_description', 'meta_title', 'meta_keyword','status','image','model','sku'
-        ,'date_available','quantity','price','tag'];
+        ,'date_available','quantity','price','tag','multiple_images'];
 
     public function offers()
     {
@@ -36,4 +36,20 @@ class Product extends Model
     {
         return $query->has('offers');
     }
+
+    public function mostlyViewed()
+    {
+        return $this->belongsToMany(HomePage::class, 'homepage_mostly_view_product');
+    }
+
+    public function topProducts()
+    {
+        return $this->belongsToMany(HomePage::class, 'homepage_top_product');
+    }
+
+    public function offerProducts()
+    {
+        return $this->belongsToMany(HomePage::class, 'homepage_offer_product');
+    }
+
 }

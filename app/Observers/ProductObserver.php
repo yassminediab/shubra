@@ -10,18 +10,22 @@ class ProductObserver
 {
     public function creating(Model $product)
     {
-        AdminActivity::create([
-            'user_id' => auth()->user()->id,
-            'action' => auth()->user()->name.'إضافة منتج جديد بواسطة '. $product->name
-        ]);
+        if(auth()->user()) {
+            AdminActivity::create([
+                'user_id' => auth()->user()->id,
+                'action' => auth()->user()->name . 'إضافة منتج جديد بواسطة ' . $product->name
+            ]);
+        }
     }
 
     public function updated(Model $product)
     {
-        AdminActivity::create([
-            'user_id' => auth()->user()->id,
-            'action' => auth()->user()->name.'قام بتعديل فى منتج  '. $product->name
-        ]);
+        if(!auth()->guest()) {
+            AdminActivity::create([
+                'user_id' => auth()->user()->id,
+                'action' => auth()->user()->name . 'قام بتعديل فى منتج  ' . $product->name
+            ]);
+        }
     }
 
     public function deleted(Model $product)
